@@ -11,6 +11,10 @@ import urllib.request
 
 
 def request_deployment(url, token, digest, registry_token=""):
+    url = _single_line_value(url, "Deployment URL")
+    token = _single_line_value(token, "Deployment token")
+    digest = _single_line_value(digest, "Image digest")
+    registry_token = _single_line_value(registry_token, "Registry token")
     address = urllib.parse.urlsplit(url)
     if (
         address.scheme != "https"
@@ -47,6 +51,13 @@ def request_deployment(url, token, digest, registry_token=""):
         if response.status != 200 or result.get("status") != "healthy":
             raise ValueError("The deployed image did not become healthy.")
         return result
+
+
+def _single_line_value(value, label):
+    normalized = value.strip()
+    if "\r" in normalized or "\n" in normalized:
+        raise ValueError(f"{label} must be a single line.")
+    return normalized
 
 
 if __name__ == "__main__":
