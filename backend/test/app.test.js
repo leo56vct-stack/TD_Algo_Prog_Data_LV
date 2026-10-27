@@ -246,6 +246,14 @@ test("classroom demo seeds fictional accounts and disables email workflows", asy
     .get("/api/trainings")
     .set("Authorization", `Bearer ${memberLogin.body.token}`);
   assert.equal(trainings.status, 200);
-  assert.equal(trainings.body.trainings[0].title, "Séance découverte");
-  assert.equal(trainings.body.trainings[0].effective_status, "present");
+  assert.equal(trainings.body.trainings.length, 5);
+  const swimTraining = trainings.body.trainings.find((training) => training.title === "Natation technique");
+  assert.equal(swimTraining.effective_status, "present");
+
+  const coachAttendance = await request(app)
+    .get(`/api/trainings/${swimTraining.id}/attendance`)
+    .set("Authorization", `Bearer ${coachLogin.body.token}`);
+  assert.equal(coachAttendance.status, 200);
+  assert.equal(coachAttendance.body.members.length, 5);
+  assert.deepEqual(coachAttendance.body.counts, { present: 3, absent: 1, pending: 1 });
 });
