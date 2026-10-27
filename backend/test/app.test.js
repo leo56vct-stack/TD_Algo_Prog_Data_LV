@@ -162,6 +162,30 @@ test("only staff can manage trainings and a member can submit one editable respo
   assert.equal(responses.rows[0].status, "absent");
 });
 
+test("a coach can create a competition as a distinct event kind", async (t) => {
+  const { app, pool } = await setup();
+  t.after(() => pool.end());
+  const coach = await addUser(pool, {
+    fullName: "Coach",
+    email: "coach@club.example",
+    role: "coach",
+  });
+
+  const created = await request(app)
+    .post("/api/trainings")
+    .set("Authorization", authHeader(coach))
+    .send({
+      title: "Triathlon de Vannes",
+      kind: "competition",
+      discipline: "Triathlon",
+      startsAt: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+      location: "Vannes",
+    });
+
+  assert.equal(created.status, 201);
+  assert.equal(created.body.training.kind, "competition");
+});
+
 test("an unanswered member is counted absent after the 24-hour deadline", async (t) => {
   const { app, pool } = await setup();
   t.after(() => pool.end());
@@ -246,7 +270,15 @@ test("classroom demo seeds fictional accounts and disables email workflows", asy
     .get("/api/trainings")
     .set("Authorization", `Bearer ${memberLogin.body.token}`);
   assert.equal(trainings.status, 200);
-  assert.equal(trainings.body.trainings.length, 5);
+  assert.equal(trainings.body.trainings.length, 6);
+  const competition = trainings.body.trainings.find((event) => event.kind === "competition");
+  assert.equal(competition.title, "Triathlon de Vannes - équipe démo");
+
+  const competitionRoster = await request(app)
+    .get(`/api/trainings/${competition.id}/attendance`)
+    .set("Authorization", `Bearer ${coachLogin.body.token}`);
+  assert.equal(competitionRoster.status, 200);
+  assert.deepEqual(competitionRoster.body.counts, { present: 4, absent: 1, pending: 0 });
   const swimTraining = trainings.body.trainings.find((training) => training.title === "Natation technique");
   assert.equal(swimTraining.effective_status, "present");
 

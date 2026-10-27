@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS trainings (
   id BIGSERIAL PRIMARY KEY,
   title TEXT NOT NULL,
+  kind TEXT NOT NULL DEFAULT 'training' CHECK (kind IN ('training', 'competition')),
   discipline TEXT,
   starts_at TIMESTAMPTZ NOT NULL,
   location TEXT,
@@ -22,6 +23,8 @@ CREATE TABLE IF NOT EXISTS trainings (
   created_by BIGINT REFERENCES users(id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE trainings ADD COLUMN IF NOT EXISTS kind TEXT NOT NULL DEFAULT 'training';
 
 CREATE TABLE IF NOT EXISTS attendance_responses (
   id BIGSERIAL PRIMARY KEY,

@@ -210,7 +210,7 @@ export function createApp({
 
   app.get("/api/trainings", authenticate, async (request, response) => {
     const result = await pool.query(
-      `SELECT t.id, t.title, t.discipline, t.starts_at, t.location, t.notes,
+      `SELECT t.id, t.title, t.kind, t.discipline, t.starts_at, t.location, t.notes,
               a.status AS response_status
        FROM trainings t
        LEFT JOIN attendance_responses a ON a.training_id = t.id AND a.member_id = $1
@@ -229,30 +229,36 @@ export function createApp({
   });
 
   app.post("/api/trainings", authenticate, requireRole("coach", "admin"), async (request, response) => {
-    const { title, discipline = null, startsAt, location = null, notes = null } = request.body ?? {};
+    const { title, kind = "training", discipline = null, startsAt, location = null, notes = null } = request.body ?? {};
     const startsAtDate = parseDate(startsAt);
     if (typeof title !== "string" || !title.trim() || !startsAtDate) {
       return response.status(400).json({ error: "Title and a valid start date are required." });
     }
+    if (!isValidEventKind(kind)) {
+      return response.status(400).json({ error: "Kind must be 'training' or 'competition'." });
+    }
     const result = await pool.query(
-      `INSERT INTO trainings (title, discipline, starts_at, location, notes, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id, title, discipline, starts_at, location, notes`,
-      [title.trim(), discipline, startsAtDate, location, notes, request.user.id],
+      `INSERT INTO trainings (title, kind, discipline, starts_at, location, notes, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id, title, kind, discipline, starts_at, location, notes`,
+      [title.trim(), kind, discipline, startsAtDate, location, notes, request.user.id],
     );
     return response.status(201).json({ training: result.rows[0] });
   });
 
   app.put("/api/trainings/:id", authenticate, requireRole("coach", "admin"), async (request, response) => {
-    const { title, discipline = null, startsAt, location = null, notes = null } = request.body ?? {};
+    const { title, kind = "training", discipline = null, startsAt, location = null, notes = null } = request.body ?? {};
     const startsAtDate = parseDate(startsAt);
     if (typeof title !== "string" || !title.trim() || !startsAtDate) {
       return response.status(400).json({ error: "Title and a valid start date are required." });
     }
+    if (!isValidEventKind(kind)) {
+      return response.status(400).json({ error: "Kind must be 'training' or 'competition'." });
+    }
     const result = await pool.query(
-      `UPDATE trainings SET title = $1, discipline = $2, starts_at = $3, location = $4, notes = $5
-       WHERE id = $6 RETURNING id, title, discipline, starts_at, location, notes`,
-      [title.trim(), discipline, startsAtDate, location, notes, request.params.id],
+      `UPDATE trainings SET title = $1, kind = $2, discipline = $3, starts_at = $4, location = $5, notes = $6
+       WHERE id = $7 RETURNING id, title, kind, discipline, starts_at, location, notes`,
+      [title.trim(), kind, discipline, startsAtDate, location, notes, request.params.id],
     );
     if (result.rowCount === 0) {
       return response.status(404).json({ error: "Training not found." });
@@ -365,4 +371,8 @@ function parseDate(value) {
 
 function publicUser(user) {
   return { id: user.id, full_name: user.full_name, email: user.email, role: user.role };
+}
+
+function isValidEventKind(value) {
+  return value === "training" || value === "competition";
 }

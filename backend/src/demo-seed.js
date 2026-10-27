@@ -23,19 +23,20 @@ const demoRoster = [
 ];
 
 const demoSchedule = [
-  { title: "Natation technique", discipline: "Natation", daysFromNow: 2, hour: 18, minute: 30, location: "Piscine municipale", notes: "Éducatifs et travail d'allure. Données de démonstration." },
-  { title: "Course à pied fractionnée", discipline: "Course à pied", daysFromNow: 3, hour: 18, minute: 0, location: "Stade municipal", notes: "Séance fictive : séries courtes et récupération." },
-  { title: "Vélo endurance", discipline: "Vélo", daysFromNow: 4, hour: 9, minute: 0, location: "Parking du stade", notes: "Sortie fictive en groupe, allure régulière." },
-  { title: "Renforcement et mobilité", discipline: "Renforcement", daysFromNow: 5, hour: 19, minute: 0, location: "Salle du club", notes: "Matériel léger, séance accessible à tous." },
-  { title: "Enchaînement vélo-course", discipline: "Triathlon", daysFromNow: 6, hour: 10, minute: 0, location: "Base de loisirs", notes: "Atelier fictif de transition vélo-course." },
+  { title: "Natation technique", kind: "training", discipline: "Natation", daysFromNow: 2, hour: 18, minute: 30, location: "Piscine municipale", notes: "Éducatifs et travail d'allure. Données de démonstration." },
+  { title: "Course à pied fractionnée", kind: "training", discipline: "Course à pied", daysFromNow: 3, hour: 18, minute: 0, location: "Stade municipal", notes: "Séance fictive : séries courtes et récupération." },
+  { title: "Vélo endurance", kind: "training", discipline: "Vélo", daysFromNow: 4, hour: 9, minute: 0, location: "Parking du stade", notes: "Sortie fictive en groupe, allure régulière." },
+  { title: "Renforcement et mobilité", kind: "training", discipline: "Renforcement", daysFromNow: 5, hour: 19, minute: 0, location: "Salle du club", notes: "Matériel léger, séance accessible à tous." },
+  { title: "Enchaînement vélo-course", kind: "training", discipline: "Triathlon", daysFromNow: 6, hour: 10, minute: 0, location: "Base de loisirs", notes: "Atelier fictif de transition vélo-course." },
+  { title: "Triathlon de Vannes - équipe démo", kind: "competition", discipline: "Triathlon", daysFromNow: 9, hour: 8, minute: 0, location: "Vannes", notes: "Course collective fictive : covoiturage et encouragements au bord du parcours." },
 ];
 
 const demoResponseMatrix = [
-  ["present", "present", "absent", "present", "absent"],
-  ["present", "present", "present", "present", "absent"],
-  ["present", "absent", "present", null, "present"],
-  ["absent", "present", null, "present", "present"],
-  [null, "present", "present", "absent", "present"],
+  ["present", "present", "absent", "present", "absent", "present"],
+  ["present", "present", "present", "present", "absent", "present"],
+  ["present", "absent", "present", null, "present", "present"],
+  ["absent", "present", null, "present", "present", "present"],
+  [null, "present", "present", "absent", "present", "absent"],
 ];
 
 export async function initializeDemoData(pool) {
@@ -83,11 +84,21 @@ export async function initializeDemoData(pool) {
        ORDER BY starts_at LIMIT 1`,
       [session.title],
     );
-    const trainingId = existing.rows[0]?.id ?? (await pool.query(
-      `INSERT INTO trainings (title, discipline, starts_at, location, notes, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-      [session.title, session.discipline, startsAt, session.location, session.notes, accounts.coach],
-    )).rows[0].id;
+    let resolvedTrainingId = existing.rows[0]?.id;
+    if (resolvedTrainingId) {
+      await pool.query(
+        `UPDATE trainings SET kind = $1, discipline = $2, starts_at = $3,
+           location = $4, notes = $5 WHERE id = $6`,
+        [session.kind, session.discipline, startsAt, session.location, session.notes, resolvedTrainingId],
+      );
+    } else {
+      const created = await pool.query(
+        `INSERT INTO trainings (title, kind, discipline, starts_at, location, notes, created_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+        [session.title, session.kind, session.discipline, startsAt, session.location, session.notes, accounts.coach],
+      );
+      resolvedTrainingId = created.rows[0].id;
+    }
 
     for (let memberIndex = 0; memberIndex < memberIds.length; memberIndex += 1) {
       const status = demoResponseMatrix[memberIndex][index];
@@ -97,7 +108,7 @@ export async function initializeDemoData(pool) {
          VALUES ($1, $2, $3)
          ON CONFLICT (member_id, training_id)
          DO UPDATE SET status = EXCLUDED.status`,
-        [memberIds[memberIndex], trainingId, status],
+        [memberIds[memberIndex], resolvedTrainingId, status],
       );
     }
   }

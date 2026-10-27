@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Activity, ArrowRight, Bike, CalendarDays, Check, Clock3, Footprints, LockKeyhole, LogOut, Mail, Plus, UsersRound, Waves, X } from 'lucide-react'
+import { Activity, ArrowRight, Bike, CalendarDays, Check, Clock3, Footprints, LockKeyhole, LogOut, Mail, Plus, Trophy, UsersRound, Waves, X } from 'lucide-react'
 import './dashboard.css'
+import './club-theme.css'
 
 const API_PREFIX = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/api`
 const COURSE_DEMO_MODE = import.meta.env.VITE_COURSE_DEMO_MODE === 'true'
@@ -181,8 +182,8 @@ function AuthView({ onLogin }) {
   return (
     <main className="auth-page">
       <section className="auth-story">
-        <a className="brand brand-light" href="/" aria-label="Club Triathlon, accueil"><span className="brand-mark"><Activity size={21} strokeWidth={2.6} /></span><span>CLUB<span className="brand-dot">.</span>TRIATHLON</span></a>
-        <div className="story-copy"><span className="eyebrow eyebrow-light">ENSEMBLE, SUR CHAQUE LIGNE</span><h1>Chaque séance<br />commence ici.</h1><p>Les bons rendez-vous, les bonnes personnes, au bon endroit.</p></div>
+        <a className="brand brand-light" href="/" aria-label="Triathlé Vannes Agglo, accueil"><span className="brand-mark"><Activity size={21} strokeWidth={2.6} /></span><span>TRIATHLÉ VANNES</span></a>
+        <div className="story-copy"><span className="eyebrow eyebrow-light">TRIATHLÉ VANNES AGGLO</span><h1>Entraînements<br />et compétitions.</h1><p>Les rendez-vous du club, les courses en équipe et les effectifs de la semaine.</p></div>
         <div className="story-footer"><span className="story-line" /> NATATION · VÉLO · COURSE</div>
       </section>
       <section className="auth-form-side">
@@ -220,24 +221,24 @@ function Dashboard({ session, trainings, rosters, selectedTrainingId, onSelectTr
   return (
     <div className="dashboard-shell">
       <header className="topbar">
-        <a className="brand" href="/" aria-label="Club Triathlon, accueil"><span className="brand-mark"><Activity size={19} strokeWidth={2.6} /></span><span>CLUB<span className="brand-dot">.</span>TRIATHLON</span></a>
+        <a className="brand" href="/" aria-label="Triathlé Vannes Agglo, accueil"><span className="brand-mark"><Activity size={19} strokeWidth={2.6} /></span><span>TRIATHLÉ VANNES</span></a>
         <div className="topbar-right"><span className="role-chip">{isStaff ? 'ÉQUIPE ENCADRANTE' : 'ESPACE ADHÉRENT'}</span><span className="topbar-name">{session.user.full_name}</span><button className="icon-button" type="button" onClick={onLogout} aria-label="Se déconnecter" title="Se déconnecter"><LogOut size={18} /></button></div>
       </header>
       <main className="dashboard-main">
         <div className="week-banner"><div className="week-kicker"><CalendarDays size={15} /> {formatWeek()}</div><div className="week-status"><span className="live-dot" /> SAISON EN COURS</div></div>
         <section className="dashboard-heading">
-          <div><span className="eyebrow">LE RENDEZ-VOUS DE LA SEMAINE</span><h1>{isStaff ? 'Le groupe prend forme.' : 'Tu viens cette semaine ?'}</h1><p>{isStaff ? 'Les effectifs en un coup d’œil. La semaine se prépare ici.' : 'Fais connaître ta présence séance par séance.'}</p></div>
+          <div><span className="eyebrow">LE RENDEZ-VOUS DE LA SEMAINE</span><h1>{isStaff ? 'Le groupe prend forme.' : 'Tu viens cette semaine ?'}</h1><p>{isStaff ? 'Entraînements et compétitions : les effectifs en un coup d’œil.' : 'Fais connaître ta présence, en séance comme en course.'}</p></div>
           <div className="stat-strip"><div className="stat-item"><span className="stat-value">{String(trainings.length).padStart(2, '0')}</span><span className="stat-label">SÉANCES</span></div><span className="stat-rule" /><div className="stat-item"><span className="stat-value">{String(isStaff ? totalPresent : attended).padStart(2, '0')}</span><span className="stat-label">{isStaff ? 'PRÉSENCES' : 'MES OUI'}</span></div>{!isStaff && <><span className="stat-rule" /><div className="stat-item"><span className="stat-value">{String(Math.max(trainings.length - responded, 0)).padStart(2, '0')}</span><span className="stat-label">À RÉPONDRE</span></div></>}</div>
         </section>
         {error && <div className="dashboard-alert" role="alert">{error}</div>}
         <div className="dashboard-grid">
           <section className="sessions-section">
-            <div className="section-heading"><div><span className="eyebrow">AGENDA DU CLUB</span><h2>Les entraînements</h2></div><span className="section-count">{trainings.length} SÉANCE{trainings.length === 1 ? '' : 'S'}</span></div>
+            <div className="section-heading"><div><span className="eyebrow">AGENDA DU CLUB</span><h2>Les rendez-vous</h2></div><span className="section-count">{trainings.length} ÉVÉNEMENT{trainings.length === 1 ? '' : 'S'}</span></div>
             {loading && trainings.length === 0 ? <div className="empty-state">Chargement des entraînements…</div> : trainings.length === 0 ? <div className="empty-state"><CalendarDays size={25} /><strong>La semaine est encore libre.</strong><span>{isStaff ? 'Ajoute les premières séances dans le panneau à droite.' : 'Les entraîneurs publieront bientôt les prochains rendez-vous.'}</span></div> : <div className="training-list">{trainings.map((training, index) => <TrainingRow key={training.id} training={training} index={index} isStaff={isStaff} roster={rosters[training.id]} selected={String(selectedTraining?.id) === String(training.id)} onSelect={() => onSelectTraining(training.id)} token={session.token} onRefresh={onRefresh} />)}</div>}
           </section>
           <aside className="side-column">{isStaff ? <><TrainingForm token={session.token} onCreated={onRefresh} />{!COURSE_DEMO_MODE && <MemberForm token={session.token} isAdmin={session.user.role === 'admin'} />}{selectedTraining && <RosterPanel training={selectedTraining} roster={selectedRoster} />}</> : <MemberNote trainings={trainings} />}</aside>
         </div>
-        <footer className="dashboard-footer"><span>CLUB TRIATHLON</span><span>On se retrouve sur la ligne de départ.</span></footer>
+        <footer className="dashboard-footer"><span>TRIATHLÉ VANNES AGGLO</span><span>On se retrouve sur la ligne de départ.</span></footer>
       </main>
     </div>
   )
@@ -248,6 +249,7 @@ function TrainingRow({ training, index, isStaff, roster, selected, onSelect, tok
   const responseExists = Boolean(training.response_status)
   const isLocked = !training.response_editable
   const kind = training.discipline?.toLowerCase() || ''
+  const isCompetition = training.kind === 'competition'
   const DisciplineIcon = kind.includes('nat') ? Waves : kind.includes('vélo') || kind.includes('velo') ? Bike : Footprints
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -268,15 +270,15 @@ function TrainingRow({ training, index, isStaff, roster, selected, onSelect, tok
   return (
     <article className={`training-row ${selected && isStaff ? 'training-row-selected' : ''}`} onClick={isStaff ? onSelect : undefined}>
       <div className="date-block"><span>{date.weekday}</span><strong>{date.day}</strong><span>{date.month}</span></div>
-      <div className="training-content"><div className="training-title-line"><span className={`sport-icon sport-${index % 3}`}><DisciplineIcon size={17} /></span><div><h3>{training.title}</h3><p>{training.discipline || 'Entraînement club'}</p></div></div><div className="training-meta"><span><Clock3 size={14} /> {date.time}</span>{training.location && <span><UsersRound size={14} /> {training.location}</span>}</div>{training.notes && <p className="training-notes">{training.notes}</p>}{error && <p className="inline-error" role="alert">{error}</p>}</div>
-      {isStaff ? <div className="row-response staff-count"><span className="status-label">{roster ? `${roster.counts.present} présent${roster.counts.present > 1 ? 's' : ''}` : 'Calcul…'}</span><span className="response-sub">{roster ? `${roster.counts.absent} absent${roster.counts.absent > 1 ? 's' : ''} · ${roster.counts.pending} en attente` : 'Effectifs'}</span></div> : <div className="row-response"><span className={`status-label status-${training.effective_status}`}>{training.effective_status === 'present' ? 'Je viens' : training.effective_status === 'absent' ? responseExists ? 'Absent' : 'Absent · sans réponse' : 'À confirmer'}</span>{isLocked ? <span className="response-sub locked-note"><LockKeyhole size={12} /> Réponse figée</span> : <div className="answer-buttons" aria-label={`Réponse pour ${training.title}`}><button className={`answer-button answer-yes ${training.effective_status === 'present' ? 'active' : ''}`} type="button" disabled={saving} onClick={(event) => { event.stopPropagation(); answer('present') }} aria-label="Confirmer ma présence" title="Présent"><Check size={16} /></button><button className={`answer-button answer-no ${training.effective_status === 'absent' && responseExists ? 'active' : ''}`} type="button" disabled={saving} onClick={(event) => { event.stopPropagation(); answer('absent') }} aria-label="Indiquer mon absence" title="Absent"><X size={16} /></button></div>}</div>}
+      <div className="training-content"><div className="training-title-line"><span className={`sport-icon sport-${index % 3}`}>{isCompetition ? <Trophy size={17} /> : <DisciplineIcon size={17} />}</span><div className="training-title-copy"><h3>{training.title}</h3><p>{training.discipline || 'Entraînement club'}</p></div><span className={`event-kind-badge ${isCompetition ? 'event-kind-competition' : ''}`}>{isCompetition ? 'COMPÉTITION' : 'ENTRAÎNEMENT'}</span></div><div className="training-meta"><span><Clock3 size={14} /> {date.time}</span>{training.location && <span><UsersRound size={14} /> {training.location}</span>}</div>{training.notes && <p className="training-notes">{training.notes}</p>}{error && <p className="inline-error" role="alert">{error}</p>}</div>
+      {isStaff ? <div className="row-response staff-count"><span className="status-label">{roster ? `${roster.counts.present} ${isCompetition ? 'inscrit' : 'présent'}${roster.counts.present > 1 ? 's' : ''}` : 'Calcul…'}</span><span className="response-sub">{roster ? `${roster.counts.absent} absent${roster.counts.absent > 1 ? 's' : ''} · ${roster.counts.pending} en attente` : 'Effectifs'}</span></div> : <div className="row-response"><span className={`status-label status-${training.effective_status}`}>{training.effective_status === 'present' ? isCompetition ? 'Inscrit' : 'Je viens' : training.effective_status === 'absent' ? responseExists ? isCompetition ? 'Non inscrit' : 'Absent' : 'Sans réponse' : 'À confirmer'}</span>{isLocked ? <span className="response-sub locked-note"><LockKeyhole size={12} /> Réponse figée</span> : <div className="answer-buttons" aria-label={`Réponse pour ${training.title}`}><button className={`answer-button answer-yes ${training.effective_status === 'present' ? 'active' : ''}`} type="button" disabled={saving} onClick={(event) => { event.stopPropagation(); answer('present') }} aria-label={isCompetition ? 'M’inscrire à la compétition' : 'Confirmer ma présence'} title={isCompetition ? 'Inscrit' : 'Présent'}><Check size={16} /></button><button className={`answer-button answer-no ${training.effective_status === 'absent' && responseExists ? 'active' : ''}`} type="button" disabled={saving} onClick={(event) => { event.stopPropagation(); answer('absent') }} aria-label={isCompetition ? 'Indiquer que je ne participe pas' : 'Indiquer mon absence'} title={isCompetition ? 'Non inscrit' : 'Absent'}><X size={16} /></button></div>}</div>}
       {isStaff && <span className="row-chevron"><ArrowRight size={17} /></span>}
     </article>
   )
 }
 
 function TrainingForm({ token, onCreated }) {
-  const [form, setForm] = useState({ title: '', discipline: 'Natation', startsAt: initialDateTime(), location: '', notes: '' })
+  const [form, setForm] = useState({ title: '', kind: 'training', discipline: 'Natation', startsAt: initialDateTime(), location: '', notes: '' })
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -287,13 +289,13 @@ function TrainingForm({ token, onCreated }) {
     setBusy(true); setError(''); setMessage('')
     try {
       await apiRequest('/api/trainings', { token, method: 'POST', body: JSON.stringify({ ...form, startsAt: new Date(form.startsAt).toISOString() }) })
-      setMessage('Séance ajoutée à la semaine.')
+      setMessage(form.kind === 'competition' ? 'Compétition ajoutée à la semaine.' : 'Entraînement ajouté à la semaine.')
       setForm((current) => ({ ...current, title: '', location: '', notes: '' }))
       onCreated()
     } catch (submitError) { setError(submitError.message) } finally { setBusy(false) }
   }
 
-  return <section className="tool-panel schedule-panel"><div className="panel-title"><span className="panel-icon"><Plus size={17} /></span><div><span className="eyebrow">ORGANISATION</span><h2>Ajouter une séance</h2></div></div><form className="compact-form" onSubmit={submit}><label>Nom de la séance<input value={form.title} onChange={(event) => update('title', event.target.value)} placeholder="Ex. Sortie vélo endurance" required /></label><div className="form-two-columns"><label>Discipline<select value={form.discipline} onChange={(event) => update('discipline', event.target.value)}><option>Natation</option><option>Vélo</option><option>Course à pied</option><option>Renforcement</option><option>Triathlon</option></select></label><label>Date et heure<input type="datetime-local" value={form.startsAt} onChange={(event) => update('startsAt', event.target.value)} required /></label></div><label>Lieu<input value={form.location} onChange={(event) => update('location', event.target.value)} placeholder="Ex. Piscine municipale" /></label><label>Informations pratiques<textarea value={form.notes} onChange={(event) => update('notes', event.target.value)} rows="2" placeholder="Matériel, niveau, point de rendez-vous…" /></label>{error && <p className="form-message error" role="alert">{error}</p>}{message && <p className="form-message success" role="status">{message}</p>}<button className="primary-button full-button" type="submit" disabled={busy}><Plus size={16} /> {busy ? 'Ajout…' : 'Publier la séance'}</button></form></section>
+  return <section className="tool-panel schedule-panel"><div className="panel-title"><span className="panel-icon"><Plus size={17} /></span><div><span className="eyebrow">ORGANISATION</span><h2>Ajouter un rendez-vous</h2></div></div><form className="compact-form" onSubmit={submit}><fieldset className="event-kind-fieldset"><legend>Type</legend><div className="event-kind-control"><button type="button" className={form.kind === 'training' ? 'active' : ''} aria-pressed={form.kind === 'training'} onClick={() => update('kind', 'training')}><Activity size={15} /> Entraînement</button><button type="button" className={form.kind === 'competition' ? 'active' : ''} aria-pressed={form.kind === 'competition'} onClick={() => update('kind', 'competition')}><Trophy size={15} /> Compétition</button></div></fieldset><label>{form.kind === 'competition' ? 'Nom de la course' : 'Nom de la séance'}<input value={form.title} onChange={(event) => update('title', event.target.value)} placeholder={form.kind === 'competition' ? 'Ex. Triathlon de Vannes' : 'Ex. Sortie vélo endurance'} required /></label><div className="form-two-columns"><label>Discipline<select value={form.discipline} onChange={(event) => update('discipline', event.target.value)}><option>Natation</option><option>Vélo</option><option>Course à pied</option><option>Renforcement</option><option>Triathlon</option></select></label><label>Date et heure<input type="datetime-local" value={form.startsAt} onChange={(event) => update('startsAt', event.target.value)} required /></label></div><label>Lieu<input value={form.location} onChange={(event) => update('location', event.target.value)} placeholder="Ex. Piscine municipale ou site de course" /></label><label>{form.kind === 'competition' ? 'Infos course et organisation collective' : 'Informations pratiques'}<textarea value={form.notes} onChange={(event) => update('notes', event.target.value)} rows="2" placeholder={form.kind === 'competition' ? 'Départ, covoiturage, retrait des dossards…' : 'Matériel, niveau, point de rendez-vous…'} /></label>{error && <p className="form-message error" role="alert">{error}</p>}{message && <p className="form-message success" role="status">{message}</p>}<button className="primary-button full-button" type="submit" disabled={busy}><Plus size={16} /> {busy ? 'Publication…' : form.kind === 'competition' ? 'Publier la compétition' : 'Publier l’entraînement'}</button></form></section>
 }
 
 function MemberForm({ token, isAdmin }) {
@@ -315,7 +317,8 @@ function MemberForm({ token, isAdmin }) {
 }
 
 function RosterPanel({ training, roster }) {
-  return <section className="roster-panel"><div className="roster-heading"><div><span className="eyebrow">EFFECTIFS</span><h2>{training.title}</h2></div><UsersRound size={19} /></div>{!roster ? <p className="roster-empty">Chargement des réponses…</p> : roster.members.length === 0 ? <p className="roster-empty">Aucun compte adhérent actif.</p> : <><div className="roster-counts"><span><i className="count-dot dot-present" /> {roster.counts.present} présent{roster.counts.present > 1 ? 's' : ''}</span><span><i className="count-dot dot-absent" /> {roster.counts.absent} absent{roster.counts.absent > 1 ? 's' : ''}</span></div><div className="roster-list">{roster.members.map((member) => <div className="roster-person" key={member.id}><span className="person-initials">{member.full_name.split(' ').map((part) => part[0]).slice(0, 2).join('').toUpperCase()}</span><span className="person-name">{member.full_name}</span><span className={`person-status person-${member.effective_status}`}>{member.effective_status === 'present' ? 'Présent' : member.effective_status === 'pending' ? 'En attente' : member.response ? 'Absent' : 'Sans réponse'}</span></div>)}</div></>}</section>
+  const isCompetition = training.kind === 'competition'
+  return <section className="roster-panel"><div className="roster-heading"><div><span className="eyebrow">{isCompetition ? 'ENGAGÉS À LA COURSE' : 'EFFECTIFS DE LA SÉANCE'}</span><h2>{training.title}</h2></div>{isCompetition ? <Trophy size={19} /> : <UsersRound size={19} />}</div>{!roster ? <p className="roster-empty">Chargement des réponses…</p> : roster.members.length === 0 ? <p className="roster-empty">Aucun compte adhérent actif.</p> : <><div className="roster-counts"><span><i className="count-dot dot-present" /> {roster.counts.present} {isCompetition ? 'inscrit' : 'présent'}{roster.counts.present > 1 ? 's' : ''}</span><span><i className="count-dot dot-absent" /> {roster.counts.absent} absent{roster.counts.absent > 1 ? 's' : ''}</span></div><div className="roster-list">{roster.members.map((member) => <div className="roster-person" key={member.id}><span className="person-initials">{member.full_name.split(' ').map((part) => part[0]).slice(0, 2).join('').toUpperCase()}</span><span className="person-name">{member.full_name}</span><span className={`person-status person-${member.effective_status}`}>{member.effective_status === 'present' ? isCompetition ? 'Inscrit' : 'Présent' : member.effective_status === 'pending' ? 'En attente' : member.response ? isCompetition ? 'Non inscrit' : 'Absent' : 'Sans réponse'}</span></div>)}</div></>}</section>
 }
 
 function MemberNote({ trainings }) {

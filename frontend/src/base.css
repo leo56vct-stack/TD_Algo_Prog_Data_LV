@@ -1,9 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
+  --club-blue: #1d5f8b;
+  --club-blue-deep: #123954;
+  --club-blue-wash: #e8f1f7;
+  --club-green: #78ad3b;
+  --club-green-deep: #4b7f32;
+  --club-green-wash: #edf4e5;
+  --club-ink: #20394c;
   font-family: 'DM Sans', 'Segoe UI', sans-serif;
-  color: #243a2f;
-  background: #f4f3ed;
+  color: var(--club-ink);
+  background: #f3f5f5;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -15,5 +22,5 @@
 * { box-sizing: border-box; }
 body { min-width: 320px; min-height: 100vh; margin: 0; }
 button, input, select, textarea { font: inherit; }
-button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid #e38a65; outline-offset: 2px; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--club-green); outline-offset: 2px; }
 #root { min-height: 100vh; }

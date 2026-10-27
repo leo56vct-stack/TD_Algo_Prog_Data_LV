@@ -1,8 +1,8 @@
-# Gestion des présences aux entraînements de triathlon
+# Présences — Triathlé Vannes Agglo
 
 ## Présentation
 
-Cette application web permet aux adhérents d'un club de triathlon d'indiquer s'ils participeront aux entraînements. Les entraîneurs peuvent consulter les réponses afin d'estimer le nombre d'athlètes présents à chaque séance et d'adapter son organisation.
+Cette application web permet aux adhérents du Triathlé Vannes Agglo d'indiquer leur participation aux entraînements et aux compétitions. Pour une course, plusieurs adhérents peuvent s'inscrire au même événement. Les entraîneurs consultent les participants et les effectifs par rendez-vous.
 
 Le projet est réalisé dans le cadre d'un travail scolaire.
 
@@ -21,22 +21,23 @@ Les adhérents accèdent à l'application grâce à un lien partagé dans le gro
 
 - Recevoir automatiquement un e-mail après validation de sa licence, puis activer son compte.
 - Se connecter depuis le lien partagé dans le groupe WhatsApp avec son adresse e-mail et son mot de passe.
-- Consulter les entraînements à venir.
-- Indiquer sa présence ou son absence à une séance.
-- Modifier sa réponse jusqu'à 24 heures avant le début de la séance.
+- Consulter les entraînements et compétitions à venir.
+- Confirmer ou décliner sa participation à chaque événement.
+- S'inscrire à une compétition avec les autres adhérents intéressés.
+- Modifier sa réponse jusqu'à 24 heures avant l'événement.
 
 ### Entraîneur
 
 - Accéder aux fonctionnalités réservées aux entraîneurs.
-- Consulter les réponses pour chaque entraînement.
-- Voir le nombre de présences confirmées et la liste des participants.
-- Ajouter simplement les entraînements de la semaine en début de semaine.
-- Modifier ou supprimer un entraînement si nécessaire.
+- Consulter les effectifs et les participants de chaque entraînement ou compétition.
+- Ajouter les entraînements de la semaine et publier les courses auxquelles le club souhaite participer.
+- Modifier ou supprimer un événement si nécessaire.
 
 ## Règles de gestion
 
-- Un adhérent ne peut avoir qu'une seule réponse par entraînement.
-- L'adhérent peut modifier sa réponse jusqu'à 24 heures avant le début de l'entraînement.
+- Un adhérent ne peut avoir qu'une seule réponse par événement, entraînement ou compétition.
+- Plusieurs adhérents peuvent répondre à la même compétition ; l'entraîneur voit la liste du groupe inscrit.
+- L'adhérent peut modifier sa réponse jusqu'à 24 heures avant le début de l'événement.
 - À partir de cette échéance, les réponses sont figées.
 - Un adhérent sans réponse à l'échéance est comptabilisé comme absent.
 - Une absence de réponse ne compte jamais comme une présence confirmée.
@@ -52,15 +53,15 @@ Les adhérents accèdent à l'application grâce à un lien partagé dans le gro
 
 L'application est organisée en deux parties :
 
-- Le front-end React affiche les entraînements et permet aux utilisateurs de gérer leurs réponses.
-- Le back-end Node.js et Express.js expose une API pour gérer les adhérents, les entraînements et les présences.
-- PostgreSQL stocke les adhérents, les entraînements et leurs réponses.
+- Le front-end React affiche les entraînements et compétitions et permet aux adhérents de gérer leurs réponses.
+- Le back-end Node.js et Express.js expose une API pour gérer les adhérents, les événements et les participations.
+- PostgreSQL stocke les adhérents, les événements typés (`training` ou `competition`) et les réponses individuelles.
 
 ## Données principales
 
 - **Adhérent :** informations nécessaires pour identifier un membre du club.
-- **Entraînement :** date, horaire, discipline et informations pratiques.
-- **Réponse :** adhérent, entraînement et statut de présence. Une contrainte garantit une seule réponse par adhérent et par entraînement.
+- **Événement :** type, nom de la séance ou de la course, date, discipline, lieu et informations pratiques.
+- **Réponse :** adhérent, événement et statut de participation. Une contrainte garantit une réponse par adhérent et par événement.
 
 ## Comptes et accès
 
@@ -81,10 +82,10 @@ Les routes privées nécessitent un jeton Bearer obtenu après connexion.
 | `GET` | `/api/me` | Utilisateur connecté | Consulter son profil |
 | `POST` | `/api/members` | Entraîneur, administration | Créer un compte adhérent et envoyer son invitation |
 | `GET` | `/api/trainings` | Utilisateur connecté | Consulter les entraînements |
-| `POST` | `/api/trainings` | Entraîneur, administration | Ajouter un entraînement |
-| `PUT` / `DELETE` | `/api/trainings/:id` | Entraîneur, administration | Modifier ou supprimer un entraînement |
-| `PUT` | `/api/trainings/:id/attendance` | Adhérent | Créer ou modifier sa réponse avant l'échéance |
-| `GET` | `/api/trainings/:id/attendance` | Entraîneur, administration | Consulter les réponses et les effectifs |
+| `POST` | `/api/trainings` | Entraîneur, administration | Ajouter un entraînement (`kind: training`) ou une compétition (`kind: competition`) |
+| `PUT` / `DELETE` | `/api/trainings/:id` | Entraîneur, administration | Modifier ou supprimer un événement |
+| `PUT` | `/api/trainings/:id/attendance` | Adhérent | S'inscrire/se désinscrire d'un événement avant l'échéance |
+| `GET` | `/api/trainings/:id/attendance` | Entraîneur, administration | Consulter les inscrits et les effectifs de l'événement |
 
 ## Lancement de l'API
 

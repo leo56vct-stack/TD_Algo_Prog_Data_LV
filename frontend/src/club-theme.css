@@ -1,0 +1,92 @@
+.auth-story { color: #f5f8fb; background: repeating-linear-gradient(135deg, transparent 0 36px, rgb(255 255 255 / 4%) 37px 38px, transparent 39px 72px), var(--club-blue-deep); }
+.auth-story::after { color: rgb(120 173 59 / 12%); }
+.brand { color: var(--club-blue-deep); }
+.brand-light { color: #fff; }
+.brand-mark { color: #fff; background: var(--club-green); }
+.brand-dot { color: var(--club-green); }
+.eyebrow { color: #58758a; }
+.eyebrow-light { color: #b6d790; }
+.story-copy h1, .auth-form-wrap h2 { color: #f7fafc; }
+.auth-form-wrap h2 { color: var(--club-blue-deep); }
+.story-copy p { color: #d7e5ef; }
+.story-footer { color: #cbe0ac; }
+.story-line { background: var(--club-green); }
+.auth-form-side { background: #f4f7f8; }
+.auth-intro, .member-note > p { color: #586d7b; }
+.auth-form label, .compact-form label { color: #173c59; }
+.input-wrap { border-color: #d5e0e7; color: #66849a; }
+.input-wrap:focus-within { border-color: var(--club-blue); box-shadow: 0 0 0 3px rgb(29 95 139 / 13%); }
+.input-wrap input { color: var(--club-blue-deep); }
+.primary-button { color: #15384a; background: var(--club-green); }
+.primary-button:hover:not(:disabled) { background: #8bc451; }
+.secondary-button { color: #fff; background: var(--club-blue); }
+.secondary-button:hover:not(:disabled) { background: #174e76; }
+.auth-switch button { color: var(--club-blue); }
+.demo-login { border-left-color: var(--club-green); color: #4a6374; background: var(--club-green-wash); }
+.demo-login strong { color: var(--club-blue-deep); }
+.dashboard-shell { background: #f2f5f6; }
+.topbar { border-bottom-color: #dce5e9; background: #fff; }
+.role-chip { color: var(--club-blue-deep); background: var(--club-blue-wash); }
+.topbar-name { color: #526979; }
+.dashboard-main { color: var(--club-ink); }
+.week-banner { border-bottom-color: #d9e3e8; }
+.week-kicker { color: var(--club-blue); }
+.live-dot { background: var(--club-green); box-shadow: 0 0 0 3px var(--club-green-wash); }
+.dashboard-heading h1, .section-heading h2, .stat-value, .date-block strong, .training-title-line h3 { color: var(--club-blue-deep); }
+.dashboard-heading p, .training-meta, .training-title-line p { color: #627887; }
+.stat-label, .week-status, .section-count { color: #627a89; }
+.stat-rule { background: #d4e0e6; }
+.training-list, .training-row, .empty-state, .dashboard-footer { border-color: #d7e1e6; }
+.training-row-selected { background: var(--club-blue-wash); }
+.sport-icon { color: var(--club-green-deep); background: var(--club-green-wash); }
+.sport-1 { color: var(--club-blue); background: var(--club-blue-wash); }
+.sport-2 { color: #a45b3d; background: #f5e9e2; }
+.event-kind-badge { flex: 0 0 auto; padding: 4px 6px; border-radius: 3px; color: var(--club-blue-deep); background: var(--club-blue-wash); font-size: 7px; font-weight: 850; letter-spacing: .55px; white-space: nowrap; }
+.event-kind-competition { color: #355f25; background: #e8f1db; }
+.status-present, .person-present { color: var(--club-green-deep); }
+.roster-list { scrollbar-gutter: stable; scrollbar-color: #7293a8 #123954; }
+.status-absent, .person-absent { color: #a64e3c; }
+.status-pending, .person-pending { color: #8a702d; }
+.answer-yes:hover, .answer-yes.active { border-color: var(--club-green); color: #355f25; background: var(--club-green-wash); }
+.answer-no:hover, .answer-no.active { border-color: #c36b5b; color: #9f4033; background: #f8e9e4; }
+.tool-panel { border-color: #d9e3e8; background: #fff; }
+.panel-icon { color: var(--club-green-deep); background: var(--club-green-wash); }
+.panel-icon-coral { color: var(--club-blue); background: var(--club-blue-wash); }
+.panel-title h2 { color: var(--club-blue-deep); }
+.compact-form input, .compact-form select, .compact-form textarea { border-color: #d5e0e7; color: var(--club-blue-deep); }
+.compact-form input:focus, .compact-form select:focus, .compact-form textarea:focus { border-color: var(--club-blue); box-shadow: 0 0 0 2px rgb(29 95 139 / 12%); }
+.event-kind-fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.event-kind-fieldset legend { margin-bottom: 6px; color: #173c59; font-size: 10px; font-weight: 750; }
+.event-kind-control { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 4px; border: 1px solid #d5e0e7; border-radius: 6px; background: #f4f7f8; }
+.event-kind-control button { display: inline-flex; min-height: 36px; align-items: center; justify-content: center; gap: 6px; padding: 6px 8px; border: 0; border-radius: 4px; color: #607989; background: transparent; font-size: 10px; font-weight: 750; cursor: pointer; }
+.event-kind-control button.active { color: #fff; background: var(--club-blue); box-shadow: 0 1px 3px rgb(18 57 84 / 20%); }
+.roster-panel { color: #f5f8fb; background: var(--club-blue-deep); }
+.roster-heading { color: #d7e8f2; }
+.roster-heading .eyebrow { color: #c3d9e6; }
+.roster-heading h2 { color: #fff; }
+.roster-counts { color: #e4edf2; border-bottom-color: rgb(255 255 255 / 18%); }
+.count-dot { background: #91c95c; }
+.dot-absent { background: #ef9176; }
+.roster-person { border-bottom-color: rgb(255 255 255 / 12%); }
+.person-initials { color: var(--club-blue-deep); background: #dcebbf; }
+.person-present { color: #a9d77c; }
+.person-absent { color: #f2a58f; }
+.person-pending { color: #e5ce8e; }
+.roster-empty { color: #d1e1ea; }
+.member-note { border-color: #d4e1e6; background: linear-gradient(145deg, var(--club-blue-wash), #f7fafb 78%); }
+.note-symbol { color: var(--club-blue); background: #d5e8f1; }
+.member-note h2, .note-next strong { color: var(--club-blue-deep); }
+.note-next { color: #526f80; border-top-color: #d4e1e6; }
+.note-complete { color: var(--club-green-deep); }
+.note-sports { border-top-color: #d4e1e6; }
+.note-sports span { color: #5d7584; }
+.empty-state { color: #627887; }
+.empty-state strong { color: var(--club-blue-deep); }
+.dashboard-footer { color: #637a88; }
+
+@media (max-width: 640px) {
+  .event-kind-badge { max-width: 70px; overflow: hidden; font-size: 6px; letter-spacing: 0; text-overflow: ellipsis; }
+  .event-kind-control button { font-size: 9px; }
+  .roster-person { grid-template-columns: 25px minmax(0, 1fr) 52px; gap: 6px; }
+  .person-status { font-size: 8px; }
+}

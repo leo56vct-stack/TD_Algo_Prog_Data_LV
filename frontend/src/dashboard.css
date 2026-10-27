@@ -116,11 +116,11 @@
 .roster-counts span { display: inline-flex; align-items: center; gap: 6px; }
 .count-dot { width: 7px; height: 7px; border-radius: 50%; background: #d7ef72; }
 .dot-absent { background: #ef9176; }
-.roster-list { max-height: 200px; overflow-y: auto; }
-.roster-person { display: grid; grid-template-columns: 27px minmax(0, 1fr) auto; gap: 8px; align-items: center; min-height: 42px; border-bottom: 1px solid rgb(255 255 255 / 10%); }
+.roster-list { max-height: 200px; overflow-y: auto; scrollbar-width: thin; }
+.roster-person { display: grid; grid-template-columns: 27px minmax(0, 1fr) 64px; gap: 8px; align-items: center; min-height: 42px; border-bottom: 1px solid rgb(255 255 255 / 10%); }
 .person-initials { display: grid; width: 25px; height: 25px; place-items: center; border-radius: 50%; color: #213c2d; background: #dce9bb; font-size: 8px; font-weight: 850; }
 .person-name { overflow: hidden; color: #f3f3e8; font-size: 10px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
-.person-status { font-size: 9px; }
+.person-status { overflow: hidden; font-size: 9px; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
 .person-present { color: #d6ef78; }
 .person-absent { color: #f1a38d; }
 .person-pending { color: #dec580; }
