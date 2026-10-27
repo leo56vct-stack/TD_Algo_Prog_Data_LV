@@ -58,9 +58,30 @@ if __name__ == "__main__":
             os.environ.get("REGISTRY_TOKEN", ""),
         )
         print(f"Deployment verified: {result['project']} @ {result['digest']}")
-    except (ValueError, OSError, urllib.error.URLError, KeyError, json.JSONDecodeError):
+    except urllib.error.HTTPError as error:
+        if error.code in (401, 403):
+            message = f"The course server refused deployment access (HTTP {error.code}). Check the token and project assignment."
+        elif error.code == 404:
+            message = "The deployment endpoint was not found (HTTP 404). Check IHME_DEPLOY_URL and the assigned project path."
+        else:
+            message = f"The course server returned HTTP {error.code}. Check the assignment and server status."
+        print(message, file=sys.stderr)
+        sys.exit(1)
+    except urllib.error.URLError:
+        print("Could not reach the course server. Check IHME_DEPLOY_URL and network availability.", file=sys.stderr)
+        sys.exit(1)
+    except json.JSONDecodeError:
+        print("The course server returned an invalid response.", file=sys.stderr)
+        sys.exit(1)
+    except ValueError as error:
+        print(f"Deployment request rejected: {error}", file=sys.stderr)
+        sys.exit(1)
+    except KeyError:
+        print("The course server response is missing expected fields.", file=sys.stderr)
+        sys.exit(1)
+    except OSError:
         print(
-            "Deployment failed or unavailable. Check the private settings and workflow summary.",
+            "A local or network error interrupted deployment. Check the workflow summary.",
             file=sys.stderr,
         )
         sys.exit(1)
