@@ -2,8 +2,12 @@ import { useEffect, useState } from 'react'
 import { Activity, ArrowRight, Bike, CalendarDays, Check, Clock3, Footprints, LockKeyhole, LogOut, Mail, Plus, UsersRound, Waves, X } from 'lucide-react'
 import './dashboard.css'
 
+const API_PREFIX = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/api`
+const COURSE_DEMO_MODE = import.meta.env.VITE_COURSE_DEMO_MODE === 'true'
+
 async function apiRequest(path, { token, ...options } = {}) {
-  const response = await fetch(path, {
+  const apiPath = path.startsWith('/api/') ? `${API_PREFIX}${path.slice(4)}` : path
+  const response = await fetch(apiPath, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -196,6 +200,7 @@ function AuthView({ onLogin }) {
             {message && <p className="form-message success" role="status">{message}</p>}
             <button className="primary-button auth-submit" type="submit" disabled={busy || ((mode === 'activate' || mode === 'reset') && !token)}>{busy ? 'Un instant…' : mode === 'login' ? 'Se connecter' : mode === 'forgot' ? 'Recevoir le lien' : mode === 'activate' ? 'Activer mon compte' : 'Changer le mot de passe'}{!busy && <ArrowRight size={17} />}</button>
           </form>
+          {COURSE_DEMO_MODE && <div className="demo-login" role="note"><strong>Accès démonstration</strong><span>Adhérent : membre.demo@example.invalid · TriathlonDemo2026!</span><span>Entraîneur : coach.demo@example.invalid · CoachDemo2026!</span></div>}
           <div className="auth-switch">{mode === 'login' ? <button type="button" onClick={() => { setMode('forgot'); setError(''); setMessage('') }}>Mot de passe oublié ?</button> : <button type="button" onClick={() => { setMode('login'); setError(''); setMessage('') }}>Retour à la connexion</button>}</div>
         </div>
         <span className="auth-privacy">Accès réservé aux adhérents du club</span>
@@ -230,7 +235,7 @@ function Dashboard({ session, trainings, rosters, selectedTrainingId, onSelectTr
             <div className="section-heading"><div><span className="eyebrow">AGENDA DU CLUB</span><h2>Les entraînements</h2></div><span className="section-count">{trainings.length} SÉANCE{trainings.length === 1 ? '' : 'S'}</span></div>
             {loading && trainings.length === 0 ? <div className="empty-state">Chargement des entraînements…</div> : trainings.length === 0 ? <div className="empty-state"><CalendarDays size={25} /><strong>La semaine est encore libre.</strong><span>{isStaff ? 'Ajoute les premières séances dans le panneau à droite.' : 'Les entraîneurs publieront bientôt les prochains rendez-vous.'}</span></div> : <div className="training-list">{trainings.map((training, index) => <TrainingRow key={training.id} training={training} index={index} isStaff={isStaff} roster={rosters[training.id]} selected={String(selectedTraining?.id) === String(training.id)} onSelect={() => onSelectTraining(training.id)} token={session.token} onRefresh={onRefresh} />)}</div>}
           </section>
-          <aside className="side-column">{isStaff ? <><TrainingForm token={session.token} onCreated={onRefresh} /><MemberForm token={session.token} isAdmin={session.user.role === 'admin'} />{selectedTraining && <RosterPanel training={selectedTraining} roster={selectedRoster} />}</> : <MemberNote trainings={trainings} />}</aside>
+          <aside className="side-column">{isStaff ? <><TrainingForm token={session.token} onCreated={onRefresh} />{!COURSE_DEMO_MODE && <MemberForm token={session.token} isAdmin={session.user.role === 'admin'} />}{selectedTraining && <RosterPanel training={selectedTraining} roster={selectedRoster} />}</> : <MemberNote trainings={trainings} />}</aside>
         </div>
         <footer className="dashboard-footer"><span>CLUB TRIATHLON</span><span>On se retrouve sur la ligne de départ.</span></footer>
       </main>

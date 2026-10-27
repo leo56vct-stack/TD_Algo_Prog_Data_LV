@@ -33,6 +33,8 @@
 .auth-switch button { padding: 5px; border: 0; color: #315e46; background: transparent; font: inherit; font-size: 12px; font-weight: 750; cursor: pointer; }
 .auth-switch button:hover { text-decoration: underline; }
 .auth-privacy { margin-top: auto; color: #8a938c; font-size: 11px; }
+.demo-login { display: grid; gap: 5px; margin-top: 17px; padding: 11px 12px; border-left: 3px solid #d7ef72; color: #516157; background: #e9eddc; font-size: 10px; overflow-wrap: anywhere; }
+.demo-login strong { color: #244233; font-size: 11px; }
 .form-message { margin: 0; font-size: 12px; line-height: 1.45; }
 .form-message.error, .inline-error { color: #b74635; }
 .form-message.success { color: #287343; }

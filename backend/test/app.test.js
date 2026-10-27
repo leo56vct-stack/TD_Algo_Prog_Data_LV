@@ -6,6 +6,7 @@ import request from "supertest";
 import { createAccessToken } from "../src/auth.js";
 import { createApp } from "../src/app.js";
 import { initializeDatabase } from "../src/database.js";
+import { demoAccounts, initializeDemoData } from "../src/demo-seed.js";
 
 const JWT_SECRET = "test-only-secret";
 const pools = [];
@@ -14,7 +15,7 @@ after(async () => {
   await Promise.all(pools.map((pool) => pool.end()));
 });
 
-async function setup() {
+async function setup({ demoMode = false } = {}) {
   const database = newDb({ autoCreateForeignKeyIndices: true });
   const { Pool } = database.adapters.createPg();
   const pool = new Pool();
@@ -28,6 +29,7 @@ async function setup() {
     jwtSecret: JWT_SECRET,
     mailer,
     frontendUrl: "http://localhost:5173",
+    demoMode,
   });
   return { app, pool, emails, mailer };
 }
@@ -210,4 +212,40 @@ test("responses are locked within 24 hours of the training", async (t) => {
     .set("Authorization", authHeader(member))
     .send({ status: "present" });
   assert.equal(answer.status, 409);
+});
+
+test("classroom demo seeds fictional accounts and disables email workflows", async (t) => {
+  const { app, pool, emails } = await setup({ demoMode: true });
+  t.after(() => pool.end());
+  await initializeDemoData(pool);
+
+  const memberLogin = await request(app)
+    .post("/api/auth/login")
+    .send({ email: demoAccounts.member.email, password: demoAccounts.member.password });
+  assert.equal(memberLogin.status, 200);
+  assert.equal(memberLogin.body.user.role, "member");
+
+  const coachLogin = await request(app)
+    .post("/api/auth/login")
+    .send({ email: demoAccounts.coach.email, password: demoAccounts.coach.password });
+  assert.equal(coachLogin.status, 200);
+
+  const invite = await request(app)
+    .post("/api/members")
+    .set("Authorization", `Bearer ${coachLogin.body.token}`)
+    .send({ fullName: "Ne doit pas être créé", email: "real@example.com" });
+  assert.equal(invite.status, 403);
+
+  const reset = await request(app)
+    .post("/api/auth/password-reset")
+    .send({ email: demoAccounts.member.email });
+  assert.equal(reset.status, 202);
+  assert.equal(emails.length, 0);
+
+  const trainings = await request(app)
+    .get("/api/trainings")
+    .set("Authorization", `Bearer ${memberLogin.body.token}`);
+  assert.equal(trainings.status, 200);
+  assert.equal(trainings.body.trainings[0].title, "Séance découverte");
+  assert.equal(trainings.body.trainings[0].effective_status, "present");
 });

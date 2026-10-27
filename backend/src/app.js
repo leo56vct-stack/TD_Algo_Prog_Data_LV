@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import cors from "cors";
 import express from "express";
+import path from "node:path";
 import {
   createAccessToken,
   createAuthMiddleware,
@@ -18,7 +19,14 @@ import { getEffectiveAttendance, isResponseEditable } from "./attendance-rules.j
 const TOKEN_LIFETIME_MS = 24 * 60 * 60 * 1000;
 const PASSWORD_MIN_LENGTH = 12;
 
-export function createApp({ pool, jwtSecret, mailer = createMailer(), frontendUrl = "http://localhost:5173" }) {
+export function createApp({
+  pool,
+  jwtSecret,
+  mailer = createMailer(),
+  frontendUrl = "http://localhost:5173",
+  frontendDist = null,
+  demoMode = false,
+}) {
   if (!pool) {
     throw new Error("A database pool is required.");
   }
@@ -32,8 +40,13 @@ export function createApp({ pool, jwtSecret, mailer = createMailer(), frontendUr
   app.use(cors({ origin: frontendUrl }));
   app.use(express.json({ limit: "20kb" }));
 
-  app.get("/api/health", (_request, response) => {
-    response.json({ status: "ok" });
+  app.get("/api/health", async (_request, response) => {
+    try {
+      await pool.query("SELECT 1");
+      return response.json({ status: "ok" });
+    } catch {
+      return response.status(503).json({ status: "unavailable" });
+    }
   });
 
   app.post("/api/auth/activate", async (request, response) => {
@@ -95,6 +108,9 @@ export function createApp({ pool, jwtSecret, mailer = createMailer(), frontendUr
     if (!email) {
       return response.status(400).json({ error: "A valid email is required." });
     }
+    if (demoMode) {
+      return response.status(202).json({ message: "Password reset is disabled in the classroom demo." });
+    }
 
     const result = await pool.query(
       "SELECT id, full_name, email FROM users WHERE email = $1 AND is_active = TRUE",
@@ -151,6 +167,9 @@ export function createApp({ pool, jwtSecret, mailer = createMailer(), frontendUr
   });
 
   app.post("/api/members", authenticate, requireRole("coach", "admin"), async (request, response) => {
+    if (demoMode) {
+      return response.status(403).json({ error: "Member invitations are disabled in the classroom demo." });
+    }
     const { fullName, email: rawEmail, role = "member" } = request.body ?? {};
     const email = normalizeEmail(rawEmail);
     if (typeof fullName !== "string" || !fullName.trim() || !email) {
@@ -310,6 +329,13 @@ export function createApp({ pool, jwtSecret, mailer = createMailer(), frontendUr
     );
     return response.json({ response: result.rows[0] });
   });
+
+  if (frontendDist) {
+    app.use(express.static(frontendDist, { index: false }));
+    app.get(/^(?!\/api(?:\/|$)).*/, (_request, response) => {
+      response.sendFile(path.join(frontendDist, "index.html"));
+    });
+  }
 
   app.use((error, _request, response, _next) => {
     if (error.code === "23505") {

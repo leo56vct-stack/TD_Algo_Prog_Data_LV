@@ -104,6 +104,33 @@ Dans un autre terminal, depuis le dossier `frontend`, installer les dépendances
 
 Pour tester l'application complète, PostgreSQL et l'API doivent être démarrés. Les courriels d'invitation nécessitent également les paramètres Gmail configurés dans `backend/.env`.
 
+## Déploiement de la démonstration du cours
+
+Le projet est référencé dans la galerie de la promotion sous l'identifiant `P20`. Le serveur du cours partage son origine entre plusieurs applications : cette version utilise donc uniquement des comptes et des données fictifs. Ne pas y importer de vrais adhérents, adresses e-mail ou présences du club.
+
+Les fichiers `Dockerfile`, `.dockerignore`, `.github/workflows/publish.yml` et `deploy/request.py` préparent la construction et le déploiement selon le kit étudiant. L'image Docker sert le front React et l'API Express sur le port 3000. Le chemin Vite est injecté au build par `IHME_BASE_PATH`.
+
+Après réception du dossier privé remis par l'enseignant, configurer dans **Settings > Secrets and variables > Actions** du dépôt GitHub :
+
+- Secret `IHME_DEPLOY_TOKEN` : jeton de déploiement individuel fourni par l'enseignant.
+- Variable `IHME_DEPLOY_URL` : URL de déploiement complète fournie par l'enseignant, se terminant par `/__deploy/p20`.
+- Variable `IHME_BASE_PATH` : chemin de l'application, normalement `/presences-aux-seances-de-triathlon/`.
+
+Ne jamais commiter ni partager le jeton, et ne pas reprendre les identifiants d'un autre projet. Après un push sur `main`, GitHub Actions construit et publie l'image dans GHCR sans changer automatiquement le site. Pour déployer, ouvrir **Actions > Construire et publier l’image > Run workflow**, sélectionner `main`, cocher **Déployer cette version après construction**, puis lancer le workflow.
+
+Les identifiants de démonstration sont affichés sur la page de connexion lorsque le mode de cours est activé :
+
+- Adhérent : `membre.demo@example.invalid` / `TriathlonDemo2026!`
+- Entraîneur : `coach.demo@example.invalid` / `CoachDemo2026!`
+
+Pour une première construction locale, Docker Desktop doit être démarré. Depuis la racine du dépôt :
+
+```powershell
+docker build --platform linux/amd64 --build-arg BASE_PATH=/presences-aux-seances-de-triathlon/ -t triathlon-presences:local .
+```
+
+Le dépôt étudiant fournit une démonstration, pas l'hébergement de production du club. Avant tout usage réel, il faudra un hébergement isolé approuvé et une configuration distincte pour les comptes, la base de données et Gmail.
+
 ## Pistes d'évolution
 
 - Filtrer les entraînements par discipline ou par groupe.

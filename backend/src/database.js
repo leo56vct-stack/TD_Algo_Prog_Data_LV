@@ -7,7 +7,7 @@ export function createPool(connectionString = process.env.DATABASE_URL) {
   if (!connectionString) {
     throw new Error("DATABASE_URL must be configured.");
   }
-  return new Pool({ connectionString });
+  return new Pool({ connectionString, max: 4 });
 }
 
 export async function initializeDatabase(pool) {

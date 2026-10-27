@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.private/
+deploy.curl
+acces-p*.txt
+*.dump
+*.log
